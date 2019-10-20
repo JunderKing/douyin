@@ -69,9 +69,15 @@ class adb():
     def back(self):
         self.shell('input keyevent 4')
 
+    # 获取屏幕分辨率
     def get_screen(self):
         output = self.shell('wm size')
         return output
+
+    # 屏幕截图
+    def screen_shot(self):
+        self.shell('screencap -p /sdcard/screen.png')
+        self.run('pull /sdcard/{}_screen.png .'.format(self.device_id))
 
     ###########################################################
 

@@ -38,7 +38,7 @@ class AiPlat(object):
         req = urllib.request.Request(self.url, self.url_data)
         try:
             rsp = urllib.request.urlopen(req)
-            str_rsp = rsp.read().decode('utf-8')
+            str_rsp = rsp.read().decode("utf-8")
             dict_rsp = json.loads(str_rsp)
             return dict_rsp
         except Exception as e:
@@ -50,6 +50,19 @@ class AiPlat(object):
         setParams(self.data, 'app_id', self.app_id)
         setParams(self.data, 'app_key', self.app_key)
         setParams(self.data, 'mode', mode)
+        setParams(self.data, 'time_stamp', int(time.time()))
+        setParams(self.data, 'nonce_str', int(time.time()))
+        image_data = base64.b64encode(image)
+        setParams(self.data, 'image', image_data.decode("utf-8"))
+        sign_str = genSignString(self.data)
+        setParams(self.data, 'sign', sign_str)
+        return self.invoke(self.data)
+
+    def ocr(self, image, mode):
+        self.url = url_preffix + 'ocr/ocr_generalocr'
+        setParams(self.data, 'app_id', self.app_id)
+        setParams(self.data, 'app_key', self.app_key)
+        #  setParams(self.data, 'mode', mode)
         setParams(self.data, 'time_stamp', int(time.time()))
         setParams(self.data, 'nonce_str', int(time.time()))
         image_data = base64.b64encode(image)
