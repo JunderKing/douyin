@@ -96,6 +96,7 @@ class action():
 
     def back(self):
         self.adb.back()
+        print(self.device_id + ': 返回')
 
     def get_number(self, string):
         try:
