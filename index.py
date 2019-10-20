@@ -63,6 +63,7 @@ def robot(device_id):
             action.to_detail()
             time.sleep(5)
             action.back()
+            time.sleep(2)
             continue
 
             if screen_data == False:
