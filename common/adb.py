@@ -76,7 +76,7 @@ class adb():
 
     # 屏幕截图
     def screen_shot(self):
-        self.shell('screencap -p /sdcard/screen.png')
+        self.shell('screencap -p /sdcard/{}_screen.png'.format(self.device_id))
         self.run('pull /sdcard/{}_screen.png .'.format(self.device_id))
 
     ###########################################################
