@@ -74,7 +74,7 @@ class action():
         bottom_x = config['detail_bottom']['x']
         bottom_y = config['detail_bottom']['y']
 
-        img = Image.open('{}_screen.png'.format(self.device_id))
+        img = Image.open('{}_screen.png'.format(self.device_id).replace('127.0.0.1:', ''))
         border_r, border_g, border_b, border_a = img.getpixel((border_x, border_y))
         bottom_r, bottom_g, bottom_b, bottom_a = img.getpixel((bottom_x, bottom_y))
         if border_r < 200 or border_g < 200 or border_b < 200:
@@ -102,7 +102,7 @@ class action():
         app_id = '2123030292'
         app_key = 'WKsdxmqtBUmNSwCO'
         self.adb.screen_shot()
-        img = Image.open('{}_screen.png'.format(self.device_id))
+        img = Image.open('{}_screen.png'.format(self.device_id).replace('127.0.0.1:', ''))
         img.resize((int(img.width / 2), int(img.height / 2))).save('optimized.png')
         with open('{}optimized.png'.format(self.device_id), 'rb') as bin_data:
             image_data = bin_data.read()
