@@ -25,6 +25,14 @@ class action():
         self.adb.swipe(x1, y1, x2, y2)
         print(self.device_id + ': 下一个')
 
+    def to_detail(self):
+        x1 = config['center_point']['x'] + config['center_point']['rx']
+        y1 = config['center_point']['y']
+        x2 = config['center_point']['x']
+        y2 = config['center_point']['y']
+        self.adb.swipe(x1, y1, x2, y2)
+        print(self.device_id + ': 详情')
+
     def detail(self):
         x = config['detail_center']['x'] + self._random_bias(10)
         y = config['detail_center']['y'] + self._random_bias(10)

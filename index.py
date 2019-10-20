@@ -46,20 +46,23 @@ def robot(device_id):
         while True:
             # 下一页
             action.next_page()
-            time.sleep(3)
-            video_type = action.get_type()
-            screen_data = False
-            if video_type == 'user':
-                time.sleep(10)
-                action.detail()
-                time.sleep(2)
+            time.sleep(15)
+            # video_type = action.get_type()
+            # screen_data = False
+            # if video_type == 'user':
+            #     time.sleep(10)
+            #     action.detail()
+            #     time.sleep(2)
                 # try:
                 #     screen_data = action.get_screen_data()
                 # except BaseException as e:
                 #     print('错误所在的行号：', e.__traceback__.tb_lineno)
-                time.sleep(2)
-                action.back()
-                time.sleep(2)
+                # time.sleep(2)
+                # action.back()
+                # time.sleep(2)
+            action.to_detail()
+            time.sleep(2)
+            action.back()
             continue
 
             if screen_data == False:
