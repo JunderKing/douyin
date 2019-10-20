@@ -46,7 +46,7 @@ def robot(device_id):
         while True:
             # 下一页
             action.next_page()
-            time.sleep(15)
+            time.sleep(10)
             # video_type = action.get_type()
             # screen_data = False
             # if video_type == 'user':
@@ -61,7 +61,7 @@ def robot(device_id):
                 # action.back()
                 # time.sleep(2)
             action.to_detail()
-            time.sleep(2)
+            time.sleep(5)
             action.back()
             continue
 
