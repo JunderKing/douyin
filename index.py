@@ -130,6 +130,7 @@ def main():
     pool = multiprocessing.Pool(len(device_list))
     for device_id in device_list:
         pool.apply_async(robot, args = (device_id,))
+        time.sleep(1)
     print('Waiting...')
     pool.close()
     pool.join()
