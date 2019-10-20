@@ -21,7 +21,7 @@ class action():
         x1 = config['center_point']['x']
         y1 = config['center_point']['y'] + config['center_point']['ry']
         x2 = config['center_point']['x']
-        y2 = config['center_point']['y']
+        y2 = config['center_point']['y'] - config['center_point']['ry']
         self.adb.swipe(x1, y1, x2, y2)
         print(self.device_id + ': 下一个')
 
