@@ -66,10 +66,10 @@ def robot(device_id):
             # time.sleep(3)
             # continue
 
-            if random.randint(1, 3) == 1:
+            if random.randint(1, 40) == 1:
                 action.follow()
                 time.sleep(2)
-            elif random.randint(1, 2) == 1:
+            elif random.randint(1, 20) == 1:
                 action.like()
                 time.sleep(2)
 
