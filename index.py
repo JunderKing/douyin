@@ -46,7 +46,7 @@ def robot(device_id):
         while True:
             # 下一页
             action.next_page()
-            time.sleep(30)
+            time.sleep(random.randint(20, 40))
             # video_type = action.get_type()
             # screen_data = False
             # if video_type == 'user':
@@ -64,10 +64,19 @@ def robot(device_id):
             # time.sleep(10)
             # action.back()
             # time.sleep(3)
-            continue
+            # continue
 
-            if screen_data == False:
-                continue
+            if random.randint(1, 3) == 1:
+                action.follow()
+                time.sleep(2)
+            elif random.randint(1, 2) == 1:
+                action.like()
+                time.sleep(2)
+
+            # if screen_data == False:
+            #     continue
+
+            continue
 
             if random.randint(1, 20) == 1 and screen_data['fan_num'] < 10000 and screen_data['follow_num'] > 10:
                 action.follow()
@@ -75,8 +84,6 @@ def robot(device_id):
             elif random.randint(1, 10) == 1 and screen_data['like_num'] < 100000 and screen_data['follow_num'] > 10:
                 action.like()
                 time.sleep(2)
-
-            continue
 
             # 点赞
             if random.randint(1, 2) == 1:

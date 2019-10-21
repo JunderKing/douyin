@@ -28,7 +28,7 @@ class action():
     def to_detail(self):
         x1 = config['center_point']['x'] + config['center_point']['rx']
         y1 = config['center_point']['y']
-        x2 = config['center_point']['x']
+        x2 = config['center_point']['x'] - config['center_point']['rx']
         y2 = config['center_point']['y']
         self.adb.swipe(x1, y1, x2, y2)
         print(self.device_id + ': 详情')
