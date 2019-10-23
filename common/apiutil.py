@@ -70,4 +70,29 @@ class AiPlat(object):
         sign_str = genSignString(self.data)
         setParams(self.data, 'sign', sign_str)
         return self.invoke(self.data)
+    
+    def image_to_text(self, image):
+        self.url = url_preffix + 'vision/vision_imgtotext'
+        setParams(self.data, 'app_id', self.app_id)
+        setParams(self.data, 'app_key', self.app_key)
+        setParams(self.data, 'time_stamp', int(time.time()))
+        setParams(self.data, 'nonce_str', int(time.time()))
+        setParams(self.data, 'session_id', int(time.time()))
+        image_data = base64.b64encode(image)
+        setParams(self.data, 'image', image_data.decode("utf-8"))
+        sign_str = genSignString(self.data)
+        setParams(self.data, 'sign', sign_str)
+        return self.invoke(self.data)
+    
+    def get_answer(self, question):
+        self.url = url_preffix + 'nlp/nlp_textchat'
+        setParams(self.data, 'app_id', self.app_id)
+        setParams(self.data, 'app_key', self.app_key)
+        setParams(self.data, 'time_stamp', int(time.time()))
+        setParams(self.data, 'nonce_str', int(time.time()))
+        setParams(self.data, 'session', int(time.time()))
+        setParams(self.data, 'question', question)
+        sign_str = genSignString(self.data)
+        setParams(self.data, 'sign', sign_str)
+        return self.invoke(self.data)
 

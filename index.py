@@ -160,19 +160,21 @@ def parser():
 cmd_args = parser()
 
 if __name__ == '__main__':
-    # adb_device = adb('CUYDU19524020220')
-    # adb_device.screen_shot()
-    # rtn_data = get_screen_data()
+    #  action_obj = action('CUYDU19524020220')
+    action_obj = action('127.0.0.1:21503')
+    # rtn_data = action_obj.get_screen_desc()
+    rtn_data = action_obj.get_home_data()
+
     # print(rtn_data)
     #  resize_image('autojump.png', 'optimized.png', 1024*1024)
 
 
-     try:
-         main()
-     except KeyboardInterrupt:
-         adb.run('kill-server')
-         print('谢谢使用')
-         exit(0)
-     except BaseException as e:
-         print(e)
-         exit(0)
+    # try:
+    #     main()
+    # except KeyboardInterrupt:
+    #     adb.run('kill-server')
+    #     print('谢谢使用')
+    #     exit(0)
+    # except BaseException as e:
+    #     print(e)
+    #     exit(0)

@@ -25,6 +25,7 @@ class action():
         self.adb.swipe(x1, y1, x2, y2)
         print(self.device_id + ': 下一个')
 
+    # 进入详情
     def to_detail(self):
         x1 = config['center_point']['x'] + config['center_point']['rx']
         y1 = config['center_point']['y']
@@ -32,12 +33,6 @@ class action():
         y2 = config['center_point']['y']
         self.adb.swipe(x1, y1, x2, y2)
         print(self.device_id + ': 详情')
-
-    def detail(self):
-        x = config['detail_center']['x'] + self._random_bias(10)
-        y = config['detail_center']['y'] + self._random_bias(10)
-        self.adb.tap(x, y)
-        print(self.device_id + ': 进入详情')
 
     # 关注
     def follow(self):
@@ -74,7 +69,8 @@ class action():
         # 触发返回按钮, keyevent 4 对应安卓系统的返回键，参考KEY 对应按钮操作：  https://www.cnblogs.com/chengchengla1990/p/4515108.html
         self.adb.back()
         print(self.device_id + ': 评论')
-
+    
+    # 获取视频类型
     def get_type(self):
         self.adb.screen_shot()
         border_x = config['detail_border']['x']
@@ -98,6 +94,7 @@ class action():
         self.adb.back()
         print(self.device_id + ': 返回')
 
+    # 获取数量
     def get_number(self, string):
         try:
             if string[-1:] == 'w':
@@ -105,15 +102,17 @@ class action():
             else:
                 return int(float(string))
         except BaseException as e:
+            print(e)
             return 0
 
+    # 获取详情页面的数据
     def get_screen_data(self):
         app_id = '2123030292'
         app_key = 'WKsdxmqtBUmNSwCO'
         self.adb.screen_shot()
         img = Image.open('{}_screen.png'.format(self.device_id).replace('127.0.0.1:', ''))
-        img.resize((int(img.width / 2), int(img.height / 2))).save('optimized.png')
-        with open('{}optimized.png'.format(self.device_id), 'rb') as bin_data:
+        img.resize((int(img.width / 2), int(img.height / 2))).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        with open('{}_optimized.png'.format(self.device_id), 'rb') as bin_data:
             image_data = bin_data.read()
 
         ai_obj = apiutil.AiPlat(app_id, app_key)
@@ -142,3 +141,86 @@ class action():
             'blog_num': blog_num,
             'interest_num': interest_num
         }
+    
+    def get_home_data(self):
+        app_id = '2123030292'
+        app_key = 'WKsdxmqtBUmNSwCO'
+        self.adb.screen_shot()
+        img = Image.open('{}_screen.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        # img.crop((10, 1788, 829, 2053)).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        # img.crop((897, 1242, 1062, 1863)).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        img = self.mask_image(img, (5, 850, 640, 1065))
+        img = self.mask_image(img, (618, 1018, 720, 1160))
+        img.crop((5, 850, 720, 1160)).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        # img.resize((int(img.width / 2), int(img.height / 2))).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        with open('{}_optimized.png'.format(self.device_id), 'rb') as bin_data:
+            image_data = bin_data.read()
+
+        ai_obj = apiutil.AiPlat(app_id, app_key)
+        rsp = ai_obj.ocr(image_data, 0)
+        print(rsp)
+        if rsp['ret'] != 0:
+            return False
+    
+    def mask_image(self, img, area):
+        print(area[0], area[1], area[2], area[3])
+        for w in range(img.width):
+            for h in range(img.height):
+                if (w >= area[0] and w <= area[2] and h >= area[1] and h <= area[3]):
+                    img.putpixel((w, h), (0, 0, 0))
+        return img
+
+    # 看图说话
+    def get_screen_desc(self):
+        app_id = '2123030292'
+        app_key = 'WKsdxmqtBUmNSwCO'
+        self.adb.screen_shot()
+        img = Image.open('{}_screen.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        img.resize((int(img.width / 2), int(img.height / 2))).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        with open('{}_optimized.png'.format(self.device_id), 'rb') as bin_data:
+            image_data = bin_data.read()
+
+        ai_obj = apiutil.AiPlat(app_id, app_key)
+        rsp = ai_obj.image_to_text(image_data)
+        print(rsp)
+        if rsp['ret'] != 0:
+            # print(rsp)
+            return False
+    
+    # 获取视频点赞数
+    def get_like_num(self):
+        app_id = '2123030292'
+        app_key = 'WKsdxmqtBUmNSwCO'
+        self.adb.screen_shot()
+
+        region_left = config['text_region']['left']
+        region_top = config['text_region']['top']
+        region_right = config['text_region']['right']
+        region_bottom = config['text_region']['bottom']
+
+        img = Image.open('{}_screen.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        img.crop(region_left, region_top, region_right, region_bottom).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        with open('{}_optimized.png'.format(self.device_id), 'rb') as bin_data:
+            image_data = bin_data.read()
+
+        ai_obj = apiutil.AiPlat(app_id, app_key)
+        rsp = ai_obj.ocr(image_data, 0)
+        if rsp['ret'] != 0:
+            print(rsp)
+            return False
+
+        print(rsp)
+    
+    def get_comment(self):
+        app_id = '2123030292'
+        app_key = 'WKsdxmqtBUmNSwCO'
+
+        question = '男朋友要带回家给爸爸看抗不抗揍呀，别害怕'
+
+        ai_obj = apiutil.AiPlat(app_id, app_key)
+        rsp = ai_obj.get_answer(question)
+        if rsp['ret'] != 0:
+            print(rsp)
+            return False
+
+        print(rsp)
