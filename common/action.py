@@ -106,7 +106,7 @@ class action():
             return 0
 
     # 获取详情页面的数据
-    def get_screen_data(self):
+    def get_detail_data(self):
         app_id = '2123030292'
         app_key = 'WKsdxmqtBUmNSwCO'
         self.adb.screen_shot()
@@ -153,7 +153,7 @@ class action():
         img = self.mask_image(img, (618, 1018, 720, 1160))
         img.crop((5, 850, 720, 1160)).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
         # img.resize((int(img.width / 2), int(img.height / 2))).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
-        with open('{}_optimized.png'.format(self.device_id), 'rb') as bin_data:
+        with open('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''), 'rb') as bin_data:
             image_data = bin_data.read()
 
         ai_obj = apiutil.AiPlat(app_id, app_key)
