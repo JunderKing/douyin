@@ -1,61 +1,86 @@
 # -*- coding: utf-8 -*-
 import random
+import time
+import sys
+import traceback
 from PIL import Image
-from common import config, apiutil
-from common.adb import adb
+from util.Adb import Adb
+from util.Ai import Ai
+from config import screen
 
 # 配置信息
-config = config.open_accordant_config()
+#  config = config.open_accordant_config()
+def get_int(string):
+    string = string.replace(' ', '')
+    try:
+        if string[-1:] == 'w' or string[-1:] == 'W':
+            return int(float(string[:-1]) * 10000)
+        else:
+            return int(float(string))
+    except BaseException as e:
+        return False
 
-class action():
+class Action():
     def __init__(self, device_id):
-        self.adb = adb(device_id)
+        self.adb = Adb(device_id)
         self.device_id = device_id
+        resolution = self.adb.get_resolution()
+        self.screen = screen.config[resolution]
+        self.image_path = 'static/screen_shot/'
 
     # 加入随机
     def _random_bias(self, num):
         return random.randint(-num, num)
 
-    # 翻到下一页
-    def next_page(self):
-        x1 = config['center_point']['x']
-        y1 = config['center_point']['y'] + config['center_point']['ry']
-        x2 = config['center_point']['x']
-        y2 = config['center_point']['y'] - config['center_point']['ry']
-        self.adb.swipe(x1, y1, x2, y2)
-        print(self.device_id + ': 下一个')
+    # 截图
+    def screen_shot(self):
+        self.adb.screen_shot()
+
+    # 滑动页面
+    def swipe_page(self, direction):
+        x, y = self.screen['screen_center']
+        if direction == 'down':
+            self.adb.swipe(x, y * 0.5, x, y * 1.5)
+        elif direction == 'up':
+            self.adb.swipe(x, y * 1.5, x, y * 0.5)
+        elif direction == 'left':
+            self.adb.swipe(x * 1.5, y, x * 0.5, y)
+        else:
+            self.adb.swipe(x * 0.5, y, x * 1.5, y)
+
+    # 点击
+    def click(self, name):
+        x, y = self.screen[name]
+        self.adb.tap(x, y)
 
     # 进入详情
     def to_detail(self):
-        x1 = config['center_point']['x'] + config['center_point']['rx']
-        y1 = config['center_point']['y']
-        x2 = config['center_point']['x'] - config['center_point']['rx']
-        y2 = config['center_point']['y']
-        self.adb.swipe(x1, y1, x2, y2)
-        print(self.device_id + ': 详情')
+        self.swipe_page('left')
+        print(self.device_id, '详情')
+
+    # 翻到下一页
+    def next_video(self):
+        self.swipe_page('up')
+        print(self.device_id, '下一个')
 
     # 关注
     def follow(self):
-        x = config['follow_bottom']['x'] + self._random_bias(10)
-        y = config['follow_bottom']['y'] + self._random_bias(10)
-        self.adb.tap(x, y)
-        print(self.device_id + ': 关注')
+        self.click('video_follow')
+        print(self.device_id, '关注')
 
     # 点赞
     def like(self):
-        x = config['star_bottom']['x'] + self._random_bias(10)
-        y = config['star_bottom']['y'] + self._random_bias(10)
-        self.adb.tap(x, y)
-        print(self.device_id + ': 点赞')
+        self.click('video_like')
+        print(self.device_id, '点赞')
 
     # 回复
     def reply(self, msg):
         # 点击评论按钮
-        self.adb.tap(config['comment_bottom']['x'], config['comment_bottom']['y'])
+        self.click('reply_btn')
         time.sleep(1)
 
         # 弹出评论列表后点击输入评论框
-        self.adb.tap(config['comment_text']['x'], config['comment_text']['y'])
+        self.click('reply_input')
         time.sleep(1)
 
         # 输入文字 ，注意要使用ADB keyboard  否则不能自动输入，参考： https://www.jianshu.com/p/2267adf15595
@@ -63,36 +88,28 @@ class action():
         time.sleep(1)
 
         # 点击发送按钮
-        self.adb.tap(config['comment_send']['x'], config['comment_send']['y'])
+        self.click('reply_send')
         time.sleep(1)
 
         # 触发返回按钮, keyevent 4 对应安卓系统的返回键，参考KEY 对应按钮操作：  https://www.cnblogs.com/chengchengla1990/p/4515108.html
         self.adb.back()
-        print(self.device_id + ': 评论')
+        print(self.device_id, '评论完成')
     
     # 获取视频类型
-    def get_type(self):
-        self.adb.screen_shot()
-        border_x = config['detail_border']['x']
-        border_y = config['detail_border']['y']
-        bottom_x = config['detail_bottom']['x']
-        bottom_y = config['detail_bottom']['y']
-
-        img = Image.open('{}_screen.png'.format(self.device_id).replace('127.0.0.1:', ''))
-        border_r, border_g, border_b, border_a = img.getpixel((border_x, border_y))
-        bottom_r, bottom_g, bottom_b, bottom_a = img.getpixel((bottom_x, bottom_y))
-        if border_r < 200 or border_g < 200 or border_b < 200:
-            print(self.device_id + ': 直播')
-            return 'live'
-        elif bottom_r > 200 and (bottom_g > 200 or bottom_b > 200):
-            print(self.device_id + ': 广告')
-            return 'adv'
-        print(self.device_id + ': 未关注用户')
-        return 'user'
+    def get_status(self):
+        img = Image.open('{}{}_screen.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''))
+        rtn = {'followed': True, 'liked': False}
+        r, g, b, a = img.getpixel(self.screen['follow_status'])
+        if r >= 200 and g < 100 and b < 100:
+            rtn['followed'] = False
+        r, g, b, a = img.getpixel(self.screen['like_status'])
+        if r < 200 or g < 200 or b < 200:
+            rtn['liked'] = True
+        return rtn
 
     def back(self):
         self.adb.back()
-        print(self.device_id + ': 返回')
+        print(self.device_id, '返回')
 
     # 获取数量
     def get_number(self, string):
@@ -143,29 +160,55 @@ class action():
         }
     
     def get_home_data(self):
-        app_id = '2123030292'
-        app_key = 'WKsdxmqtBUmNSwCO'
-        self.adb.screen_shot()
-        img = Image.open('{}_screen.png'.format(self.device_id).replace('127.0.0.1:', ''))
-        # img.crop((10, 1788, 829, 2053)).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
-        # img.crop((897, 1242, 1062, 1863)).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
-        img = self.mask_image(img, (5, 850, 640, 1065))
-        img = self.mask_image(img, (618, 1018, 720, 1160))
-        img.crop((5, 850, 720, 1160)).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
+        img = Image.open('{}{}_screen.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''))
+        img = self.mask_image(img, self.screen['home_mask'])
+        img.crop(self.screen['home_crop']).save('{}{}_optimized.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''))
         # img.resize((int(img.width / 2), int(img.height / 2))).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
-        with open('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''), 'rb') as bin_data:
+        with open('{}{}_optimized.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''), 'rb') as bin_data:
             image_data = bin_data.read()
 
-        ai_obj = apiutil.AiPlat(app_id, app_key)
-        res = ai_obj.ocr(image_data, 0)
+        for index in range(5):
+            ai = Ai()
+            res = ai.ocr(image_data)
+            if res['ret'] == 0:
+                break
+            print(self.device_id, '页面数据失败重试', index + 1)
+            time.sleep(1)
         if res['ret'] != 0:
             return False
+        rtn_dict = {}
         text_list = res['data']['item_list']
-        for index, text_obj in text_list:
-
+        for index, text_obj in enumerate(text_list):
+            text = text_obj['itemstring']
+            if text.find('广告') != -1:
+                print(self.device_id, '广告跳过')
+                return False
+            if index <= 2:
+                number = get_int(text)
+                if type(number) == bool:
+                    return False
+                if index == 0:
+                    rtn_dict['like_num'] = number
+                elif index == 1:
+                    rtn_dict['reply_num'] = number
+                elif index == 2:
+                    rtn_dict['share_num'] = number
+            else:
+                symbol_index_1 = text.find('@')
+                symbol_index_2 = text.find('#')
+                if symbol_index_1 == 0 or symbol_index_2 == 0:
+                    continue
+                if symbol_index_1 != -1:
+                    text = text[:symbol_index_1]
+                if symbol_index_2 != -1:
+                    text = text[:symbol_index_2]
+                if rtn_dict.__contains__('desc'):
+                    rtn_dict['desc'] += text
+                else:
+                    rtn_dict['desc'] = text
+        return rtn_dict
     
     def mask_image(self, img, area):
-        print(area[0], area[1], area[2], area[3])
         for w in range(img.width):
             for h in range(img.height):
                 if (w >= area[0] and w <= area[2] and h >= area[1] and h <= area[3]):
@@ -213,16 +256,14 @@ class action():
 
         print(rsp)
     
-    def get_comment(self):
-        app_id = '2123030292'
-        app_key = 'WKsdxmqtBUmNSwCO'
-
-        question = '男朋友要带回家给爸爸看抗不抗揍呀，别害怕'
-
-        ai_obj = apiutil.AiPlat(app_id, app_key)
-        rsp = ai_obj.get_answer(question)
-        if rsp['ret'] != 0:
-            print(rsp)
+    def get_answer(self, question):
+        for index in range(5):
+            ai = Ai()
+            res = ai.get_answer(question)
+            if res['ret'] == 0:
+                break
+            print(self.device_id, '评论数据失败重试', index + 1)
+            time.sleep(1)
+        if res['ret'] != 0:
             return False
-
-        print(rsp)
+        return res['data']['answer']

@@ -7,12 +7,10 @@ import base64
 import json
 import time
 
-url_preffix='https://api.ai.qq.com/fcgi-bin/'
-
+base_url = 'https://api.ai.qq.com/fcgi-bin/'
 
 def setParams(array, key, value):
     array[key] = value
-
 
 def genSignString(parser):
     uri_str = ''
@@ -25,9 +23,8 @@ def genSignString(parser):
     hash_md5 = hashlib.md5(sign_str.encode('utf-8'))
     return hash_md5.hexdigest().upper()
 
-
-class AiPlat(object):
-    def __init__(self, app_id, app_key):
+class Ai(object):
+    def __init__(self, app_id = '2123030292', app_key = 'WKsdxmqtBUmNSwCO'):
         self.app_id = app_id
         self.app_key = app_key
         self.data = {}
@@ -45,8 +42,8 @@ class AiPlat(object):
             print(e)
             return {'ret': -1}
 
-    def face_detectface(self, image, mode):
-        self.url = url_preffix + 'face/face_detectface'
+    def face_detect(self, image, mode):
+        self.url = base_url + 'face/face_detectface'
         setParams(self.data, 'app_id', self.app_id)
         setParams(self.data, 'app_key', self.app_key)
         setParams(self.data, 'mode', mode)
@@ -58,11 +55,10 @@ class AiPlat(object):
         setParams(self.data, 'sign', sign_str)
         return self.invoke(self.data)
 
-    def ocr(self, image, mode):
-        self.url = url_preffix + 'ocr/ocr_generalocr'
+    def ocr(self, image):
+        self.url = base_url + 'ocr/ocr_generalocr'
         setParams(self.data, 'app_id', self.app_id)
         setParams(self.data, 'app_key', self.app_key)
-        #  setParams(self.data, 'mode', mode)
         setParams(self.data, 'time_stamp', int(time.time()))
         setParams(self.data, 'nonce_str', int(time.time()))
         image_data = base64.b64encode(image)
@@ -72,7 +68,7 @@ class AiPlat(object):
         return self.invoke(self.data)
     
     def image_to_text(self, image):
-        self.url = url_preffix + 'vision/vision_imgtotext'
+        self.url = base_url + 'vision/vision_imgtotext'
         setParams(self.data, 'app_id', self.app_id)
         setParams(self.data, 'app_key', self.app_key)
         setParams(self.data, 'time_stamp', int(time.time()))
@@ -85,7 +81,7 @@ class AiPlat(object):
         return self.invoke(self.data)
     
     def get_answer(self, question):
-        self.url = url_preffix + 'nlp/nlp_textchat'
+        self.url = base_url + 'nlp/nlp_textchat'
         setParams(self.data, 'app_id', self.app_id)
         setParams(self.data, 'app_key', self.app_key)
         setParams(self.data, 'time_stamp', int(time.time()))
@@ -95,4 +91,3 @@ class AiPlat(object):
         sign_str = genSignString(self.data)
         setParams(self.data, 'sign', sign_str)
         return self.invoke(self.data)
-
