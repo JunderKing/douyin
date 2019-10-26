@@ -2,6 +2,7 @@
 import sys
 import time
 import argparse
+import traceback
 import multiprocessing
 from util.Adb import Adb
 from model.Device import Device
@@ -44,5 +45,6 @@ if __name__ == '__main__':
         print('谢谢使用')
         exit(0)
     except BaseException as e:
-        print(e)
+        print('exception')
+        print(traceback.format_exc())
         exit(0)

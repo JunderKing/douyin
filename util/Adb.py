@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
+import re
+import sys
 import subprocess
 import platform
 
@@ -53,11 +55,15 @@ class Adb():
         self.shell('input keyevent 4')
 
     # 获取屏幕分辨率
-    def get_screen(self):
+    def get_resolution(self):
         output = self.shell('wm size')
-        return output
+        match = re.search(r'(\d+)x(\d+)', output)
+        if match:
+            return "{width}_{height}".format(width=match.group(1), height=match.group(2))
+        return "1920_1080"
 
     # 屏幕截图
     def screen_shot(self):
         self.shell('screencap -p /sdcard/{}_screen.png'.format(self.device_id).replace('127.0.0.1:', ''))
-        self.run('pull /sdcard/{}_screen.png .'.format(self.device_id).replace('127.0.0.1:', ''))
+        self.run('pull /sdcard/{}_screen.png {}/static/screen_shot'.format(self.device_id, sys.path[0]).replace('127.0.0.1:', ''))
+        
