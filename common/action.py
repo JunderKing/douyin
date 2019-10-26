@@ -157,10 +157,12 @@ class action():
             image_data = bin_data.read()
 
         ai_obj = apiutil.AiPlat(app_id, app_key)
-        rsp = ai_obj.ocr(image_data, 0)
-        print(rsp)
-        if rsp['ret'] != 0:
+        res = ai_obj.ocr(image_data, 0)
+        if res['ret'] != 0:
             return False
+        text_list = res['data']['item_list']
+        for index, text_obj in text_list:
+
     
     def mask_image(self, img, area):
         print(area[0], area[1], area[2], area[3])
