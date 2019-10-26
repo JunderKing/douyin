@@ -1,20 +1,25 @@
 # -*- coding: utf-8 -*-
 import random
 from PIL import Image
-from common import config, apiutil
-from common.adb import adb
+from util.Adb import Adb
+from util.Ai import Ai
+from config import screen
 
 # 配置信息
-config = config.open_accordant_config()
+#  config = config.open_accordant_config()
 
-class action():
+class Action():
     def __init__(self, device_id):
-        self.adb = adb(device_id)
+        self.adb = Adb(device_id)
         self.device_id = device_id
 
     # 加入随机
     def _random_bias(self, num):
         return random.randint(-num, num)
+
+    # 截图
+    def screen_shot(self):
+        self.adb.get_screen()
 
     # 翻到下一页
     def next_page(self):
@@ -162,6 +167,7 @@ class action():
             return False
         text_list = res['data']['item_list']
         for index, text_obj in text_list:
+            pass
 
     
     def mask_image(self, img, area):
