@@ -20,9 +20,10 @@ config = {
         'like_status': (682, 874),
         'reply_btn': (682, 957),
         'reply_input': (51, 1248),
-        'reply_send': (684, 1154),
-        'home_crop': (0, 897, 720, 1164),
-        'home_mask': (0, 897, 643, 1085),
+        'reply_send': (684, 1124),
+        'home_crop': (0, 900, 720, 1164),
+        'home_mask': (0, 900, 643, 1071),
+        'home_mask2': (608, 1015, 720, 1164)
     },
     # '720_1280': {
     #     'screen_center': (360, 640),

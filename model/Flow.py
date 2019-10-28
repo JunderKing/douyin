@@ -10,8 +10,8 @@ class Flow(object):
 
     def test(self):
         print(self.device_id, '开始测试流程')
-        # self.action.screen_shot()
-        status_dict = self.action.input('安卓')
+        self.action.screen_shot()
+        status_dict = self.action.get_home_data()
         print(status_dict)
         #  flag = self.action.get_home_data()
         #  print(flag)
@@ -21,7 +21,16 @@ class Flow(object):
 
     def skim_video(self):
         print(self.device_id, '浏览视频')
+        start_time = int(time.time())
         while True:
+            # 运行3个小时，休息9个小时
+            cur_time = int(time.time())
+            if cur_time - start_time >= 3 * 3600:
+                self.adb.home()
+                time.sleep(9 * 3600)
+                start_time = int(time.time())
+                self.adb.open_douyin()
+                time.sleep(30)
             self.action.next_video()
             time.sleep(5)
             self.action.screen_shot()
@@ -37,6 +46,8 @@ class Flow(object):
             if not home_data:
                 print(self.device_id, '获取页面数据失败')
                 continue
+            else:
+                print(self.device_id, '点赞数：{}，评论数：{}'.format(home_data['like_num'], home_data['reply_num']))
 
             time.sleep(5)
 

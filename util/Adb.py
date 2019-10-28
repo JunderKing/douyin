@@ -60,6 +60,13 @@ class Adb():
     # 返回
     def back(self):
         self.shell('input keyevent 4')
+    
+    # HOME
+    def home(self):
+        self.shell('input keyevent 3')
+
+    def open_douyin(self):
+        self.shell('am start -n com.ss.android.ugc.aweme/.main.MainActivity')
 
     # 获取屏幕分辨率
     def get_resolution(self):
