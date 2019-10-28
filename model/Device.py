@@ -9,8 +9,9 @@ class Device:
     def start(self):
         print("设备启动: {}".format(self.device_id))
         try:
+            # '中文'.encode('utf8')
             flow = Flow(self.device_id)
-            #  flow.test()
+            # flow.test()
             flow.skim_video()
         except KeyboardInterrupt as e:
             print(self.device_id, '结束')

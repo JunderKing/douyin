@@ -3,6 +3,7 @@ import random
 import time
 import sys
 import traceback
+import pyperclip
 from PIL import Image
 from util.Adb import Adb
 from util.Ai import Ai
@@ -52,6 +53,24 @@ class Action():
     def click(self, name):
         x, y = self.screen[name]
         self.adb.tap(x, y)
+    
+    def long_tap(self, name):
+        x1, y1 = self.screen[name]
+        self.adb.swipe(x1, y1, x1, y1, 1000)
+    
+    def input(self, text, text_name = 'paste_point', btn_name = 'paste_btn'):
+        # print(text)
+        # self.adb.input(text)
+        # return False
+        # pyperclip.copy(text)
+        self.adb.set_clipboard(text)
+        self.adb.get_clipboard()
+        print('copy', text)
+        return false
+        time.sleep(1)
+        self.long_tap(text_name)
+        time.sleep(1)
+        self.click(btn_name)
 
     # 进入详情
     def to_detail(self):
@@ -171,6 +190,7 @@ class Action():
             ai = Ai()
             res = ai.ocr(image_data)
             if res['ret'] == 0:
+                print(res)
                 break
             print(self.device_id, '页面数据失败重试', index + 1)
             time.sleep(1)

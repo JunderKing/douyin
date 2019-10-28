@@ -48,7 +48,14 @@ class Adb():
 
     # 输入文字
     def input(self, content):
+        # self.shell("am broadcast -a ADB_INPUT_B64 --es msg `echo '{}' | base64`".format(content))
         self.shell('am broadcast -a ADB_INPUT_TEXT --es msg {}'.format(content))
+
+    def set_clipboard(self, text):
+        self.shell("am broadcast -a clipper.set -e text {}".format(text.encode('utf8').decode('unicode_escape')))
+
+    def get_clipboard(self):
+        self.shell("am broadcast -a clipper.get")
 
     # 返回
     def back(self):

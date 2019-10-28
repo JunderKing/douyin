@@ -10,8 +10,8 @@ class Flow(object):
 
     def test(self):
         print(self.device_id, '开始测试流程')
-        self.action.screen_shot()
-        status_dict = self.action.get_status()
+        # self.action.screen_shot()
+        status_dict = self.action.input('安卓')
         print(status_dict)
         #  flag = self.action.get_home_data()
         #  print(flag)
