@@ -11,5 +11,32 @@ config = {
         'reply_send': (1002, 1977),
         'home_crop': (0, 1386, 1080, 2055),
         'home_mask': (0, 1386, 903, 1850),
-    }
+    },
+    '720_1280': {
+        'screen_center': (360, 640),
+        'video_follow': (682, 810),
+        'video_like': (682, 874),
+        'follow_status': (675, 810),
+        'like_status': (682, 874),
+        'reply_btn': (682, 957),
+        'reply_input': (51, 1248),
+        'reply_send': (684, 1124),
+        'home_crop': (0, 900, 720, 1164),
+        'home_mask': (0, 900, 643, 1071),
+        'home_mask2': (608, 1015, 720, 1164)
+    },
+    # '720_1280': {
+    #     'screen_center': (360, 640),
+    #     'video_follow': (661, 498),
+    #     'video_like': (661, 606),
+    #     'follow_status': (643, 495),
+    #     'like_status': (661, 606),
+    #     'reply_btn': (660, 745),
+    #     'reply_input': (79, 1229),
+    #     'paste_point': (61, 1036),
+    #     'paste_btn': (67, 962),
+    #     'reply_send': (667, 1035),
+    #     'home_crop': (0, 642, 720, 1096),
+    #     'home_mask': (0, 642, 604, 960),
+    # },
 }

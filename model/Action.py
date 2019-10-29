@@ -3,6 +3,7 @@ import random
 import time
 import sys
 import traceback
+import pyperclip
 from PIL import Image
 from util.Adb import Adb
 from util.Ai import Ai
@@ -52,6 +53,24 @@ class Action():
     def click(self, name):
         x, y = self.screen[name]
         self.adb.tap(x, y)
+    
+    def long_tap(self, name):
+        x1, y1 = self.screen[name]
+        self.adb.swipe(x1, y1, x1, y1, 1000)
+    
+    def input(self, text, text_name = 'paste_point', btn_name = 'paste_btn'):
+        # print(text)
+        # self.adb.input(text)
+        # return False
+        # pyperclip.copy(text)
+        self.adb.set_clipboard(text)
+        self.adb.get_clipboard()
+        print('copy', text)
+        return false
+        time.sleep(1)
+        self.long_tap(text_name)
+        time.sleep(1)
+        self.click(btn_name)
 
     # 进入详情
     def to_detail(self):
@@ -162,6 +181,7 @@ class Action():
     def get_home_data(self):
         img = Image.open('{}{}_screen.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''))
         img = self.mask_image(img, self.screen['home_mask'])
+        img = self.mask_image(img, self.screen['home_mask2'])
         img.crop(self.screen['home_crop']).save('{}{}_optimized.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''))
         # img.resize((int(img.width / 2), int(img.height / 2))).save('{}_optimized.png'.format(self.device_id).replace('127.0.0.1:', ''))
         with open('{}{}_optimized.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''), 'rb') as bin_data:
@@ -171,6 +191,7 @@ class Action():
             ai = Ai()
             res = ai.ocr(image_data)
             if res['ret'] == 0:
+                # print(res)
                 break
             print(self.device_id, '页面数据失败重试', index + 1)
             time.sleep(1)
@@ -183,7 +204,7 @@ class Action():
             if text.find('广告') != -1:
                 print(self.device_id, '广告跳过')
                 return False
-            if index <= 2:
+            if index <= 1:
                 number = get_int(text)
                 if type(number) == bool:
                     return False
@@ -191,8 +212,8 @@ class Action():
                     rtn_dict['like_num'] = number
                 elif index == 1:
                     rtn_dict['reply_num'] = number
-                elif index == 2:
-                    rtn_dict['share_num'] = number
+                # elif index == 2:
+                    # rtn_dict['share_num'] = number
             else:
                 symbol_index_1 = text.find('@')
                 symbol_index_2 = text.find('#')
@@ -227,7 +248,7 @@ class Action():
 
         ai_obj = apiutil.AiPlat(app_id, app_key)
         rsp = ai_obj.image_to_text(image_data)
-        print(rsp)
+        # print(rsp)
         if rsp['ret'] != 0:
             # print(rsp)
             return False
