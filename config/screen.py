@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 config = {
     '1080_2340': {
         'screen_center': (540, 1170),
