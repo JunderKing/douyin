@@ -42,6 +42,8 @@ class Action():
         kb_r, kb_g, kb_b, kb_a = img.getpixel(self.screen['check_kb'])
         bg_r, bg_g, bg_b, bg_a = img.getpixel(self.screen['check_bg'])
         cd_r, cd_g, cd_b, cd_a = img.getpixel(self.screen['check_cd'])
+        # 如果在桌面，就重启抖音
+        # 如果有弹窗，就关闭弹窗
         if cd_r < 200 or cd_g < 200 or cd_b < 200:
             # 视频界面
             return True

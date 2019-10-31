@@ -52,7 +52,7 @@ class Flow(object):
             # 判断是否已关注
             status_dict = self.action.get_status()
             if status_dict['followed'] or status_dict['liked']:
-                repeat_count++
+                repeat_count += 1
                 print(self.device_id, '已关注或者已点赞', status_dict)
                 continue
             else:
