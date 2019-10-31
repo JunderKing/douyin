@@ -36,6 +36,42 @@ class Action():
     # 截图
     def screen_shot(self):
         self.adb.screen_shot()
+    
+    def check_home(self):
+        img = Image.open('{}{}_screen.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''))
+        kb_r, kb_g, kb_b, kb_a = img.getpixel(self.screen['check_kb'])
+        bg_r, bg_g, bg_b, bg_a = img.getpixel(self.screen['check_bg'])
+        cd_r, cd_g, cd_b, cd_a = img.getpixel(self.screen['check_cd'])
+        if cd_r < 200 or cd_g < 200 or cd_b < 200:
+            # 视频界面
+            return True
+        elif kb_r < 100 or kb_g < 100 or kb_b < 100:
+            # 已打开键盘
+            self.adb.back()
+            time.sleep(1)
+            self.adb.back()
+            time.sleep(1)
+            self.adb.back()
+            return False
+        elif bg_r < 150 or bg_g < 150 or bg_b < 150:
+            # 已打开输入
+            self.adb.back()
+            time.sleep(1)
+            self.adb.back()
+            return False
+        else:
+            self.adb.back()
+            return False
+
+
+        
+    
+    def open_douyin(self):
+        self.adb.open('com.ss.android.ugc.aweme/.main.MainActivity')
+    
+    def to_home(self):
+        self.adb.home()
+        # self.adb.quit('com.ss.android.ugc.aweme/.main.MainActivity')
 
     # 滑动页面
     def swipe_page(self, direction):
@@ -196,17 +232,19 @@ class Action():
             print(self.device_id, '页面数据失败重试', index + 1)
             time.sleep(1)
         if res['ret'] != 0:
+            print(self.device_id, '页面数据失败次数过去，跳过！')
             return False
         rtn_dict = {}
         text_list = res['data']['item_list']
         for index, text_obj in enumerate(text_list):
             text = text_obj['itemstring']
             if text.find('广告') != -1:
-                print(self.device_id, '广告跳过')
+                print(self.device_id, '广告跳过！')
                 return False
             if index <= 1:
                 number = get_int(text)
                 if type(number) == bool:
+                    print(self.device_id, '数据格式错误，跳过！')
                     return False
                 if index == 0:
                     rtn_dict['like_num'] = number
@@ -217,8 +255,11 @@ class Action():
             else:
                 symbol_index_1 = text.find('@')
                 symbol_index_2 = text.find('#')
-                if symbol_index_1 == 0 or symbol_index_2 == 0:
+                if symbol_index_1 == 0:
+                    rtn_dict['desc'] = ''
                     continue
+                # if symbol_index_2 == 0 and rtn_dict.__contains__('desc') and rtn_dict['desc'] != '':
+                    # continue
                 if symbol_index_1 != -1:
                     text = text[:symbol_index_1]
                 if symbol_index_2 != -1:
@@ -227,6 +268,8 @@ class Action():
                     rtn_dict['desc'] += text
                 else:
                     rtn_dict['desc'] = text
+                if symbol_index_1 != -1 or symbol_index_2 != -1:
+                    break
         return rtn_dict
     
     def mask_image(self, img, area):

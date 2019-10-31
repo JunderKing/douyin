@@ -25,40 +25,46 @@ class Flow(object):
         while True:
             # 运行3个小时，休息9个小时
             cur_time = int(time.time())
-            if cur_time - start_time >= 3 * 3600:
-                self.adb.home()
-                time.sleep(9 * 3600)
+            if cur_time - start_time >= 2 * 3600:
+                self.action.to_home()
+                print(self.device_id, 'waiting......')
+                time.sleep(4 * 3600)
                 start_time = int(time.time())
-                self.adb.open_douyin()
+                self.action.open_douyin()
                 time.sleep(30)
             self.action.next_video()
             time.sleep(5)
             self.action.screen_shot()
 
+            # 检查是否位于视频界面
+            flag = self.action.check_home()
+            if flag == False:
+                self.action.screen_shot()
+
             # 判断是否已关注
             status_dict = self.action.get_status()
             if status_dict['followed'] or status_dict['liked']:
                 print(self.device_id, '已关注或者已点赞', status_dict)
-                continue;
+                continue
 
             # 获取首页数据
             home_data = self.action.get_home_data()
             if not home_data:
-                print(self.device_id, '获取页面数据失败')
+                # print(self.device_id, '获取页面数据失败')
                 continue
             else:
                 print(self.device_id, '点赞数：{}，评论数：{}'.format(home_data['like_num'], home_data['reply_num']))
 
-            time.sleep(5)
 
             # 给少于1万点赞数的人关注和点赞
             if home_data['like_num'] < 10000:
                 # 点赞
                 if not status_dict['liked']:
+                    time.sleep(10)
                     self.action.like()
-                    time.sleep(2)
                 # 关注
                 if not status_dict['followed']:
+                    time.sleep(10)
                     self.action.follow()
                     time.sleep(2)
                 # 评论
@@ -67,9 +73,10 @@ class Flow(object):
                     print(self.device_id, '描述:', question)
                     answer = self.action.get_answer(question)
                     if answer:
+                        time.sleep(10)
                         print(self.device_id, '评论:', answer)
                         self.action.reply(answer)
-                        time.sleep(2)
+                        time.sleep(3)
                     else:
                         print(self.device_id, '获取评论失败')
             else:
