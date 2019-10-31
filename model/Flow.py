@@ -22,6 +22,7 @@ class Flow(object):
     def skim_video(self):
         print(self.device_id, '浏览视频')
         start_time = int(time.time())
+        repeat_count = 0;
         while True:
             # 运行3个小时，休息9个小时
             cur_time = int(time.time())
@@ -41,11 +42,21 @@ class Flow(object):
             if flag == False:
                 self.action.screen_shot()
 
+            # 5次以上重复，重启抖音
+            if repeat_count >= 5:
+                print(self.device_id, '超过5次已关注或已点赞，重启App！', status_dict)
+                self.action.restart_douyin()
+                repeat_count = 0;
+                continue;
+
             # 判断是否已关注
             status_dict = self.action.get_status()
             if status_dict['followed'] or status_dict['liked']:
+                repeat_count++
                 print(self.device_id, '已关注或者已点赞', status_dict)
                 continue
+            else:
+                repeat_count = 0
 
             # 获取首页数据
             home_data = self.action.get_home_data()

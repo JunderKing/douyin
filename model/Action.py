@@ -10,7 +10,6 @@ from util.Ai import Ai
 from config import screen
 
 # 配置信息
-#  config = config.open_accordant_config()
 def get_int(string):
     string = string.replace(' ', '')
     try:
@@ -37,6 +36,7 @@ class Action():
     def screen_shot(self):
         self.adb.screen_shot()
     
+    # 检查首页数据
     def check_home(self):
         img = Image.open('{}{}_screen.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''))
         kb_r, kb_g, kb_b, kb_a = img.getpixel(self.screen['check_kb'])
@@ -62,16 +62,25 @@ class Action():
         else:
             self.adb.back()
             return False
-
-
-        
     
-    def open_douyin(self):
-        self.adb.open('com.ss.android.ugc.aweme/.main.MainActivity')
-    
+    # 跳转至首页
     def to_home(self):
         self.adb.home()
-        # self.adb.quit('com.ss.android.ugc.aweme/.main.MainActivity')
+
+    # 打开抖音
+    def open_douyin(self):
+        self.adb.open('com.ss.android.ugc.aweme/.main.MainActivity')
+
+    # 退出抖音
+    def quit_douyin(self):
+        self.adb.quit('com.ss.android.ugc.aweme')
+
+    # 重启抖音
+    def restart_douyin(self):
+        self.quit_douyin()
+        time.sleep(10)
+        self.open_douyin()
+        time.sleep(30)
 
     # 滑动页面
     def swipe_page(self, direction):
@@ -94,6 +103,7 @@ class Action():
         x1, y1 = self.screen[name]
         self.adb.swipe(x1, y1, x1, y1, 1000)
     
+    # 复制到剪贴板
     def input(self, text, text_name = 'paste_point', btn_name = 'paste_btn'):
         # print(text)
         # self.adb.input(text)
@@ -150,7 +160,7 @@ class Action():
         self.adb.back()
         print(self.device_id, '评论完成')
     
-    # 获取视频类型
+    # 获取视频状态
     def get_status(self):
         img = Image.open('{}{}_screen.png'.format(self.image_path, self.device_id).replace('127.0.0.1:', ''))
         rtn = {'followed': True, 'liked': False}
@@ -320,6 +330,7 @@ class Action():
 
         print(rsp)
     
+    # 获取聊天
     def get_answer(self, question):
         for index in range(5):
             ai = Ai()
